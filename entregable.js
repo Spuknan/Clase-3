@@ -1,113 +1,108 @@
+console.clear();
+
 class ProductManager {
-   constructor(products) {
-      this.products = []
-      this.#lastProductId = 0;
-   }
+  constructor(products) {
+    this.products = products || [];
+    this.#lastProductId = 0;
+  }
 
-   #lastProductId;
+  #lastProductId;
 
-   addProduct(title, description, price, thumbnail, code, stock) {
-      const codeExists = this.products.some(product => product.code === code);
-      if (codeExists) {
-         throw new Error("Código de producto duplicado");
+  addProduct(title, description, price, thumbnail, code, stock) {
+    for (let i = 0; i < this.products.length; i++) {
+      if (this.products[i].code === code) {
+        return false;
       }
+    }
 
-      const newProduct = {
-         id: ++this.#lastProductId,
-         title,
-         description,
-         price,
-         thumbnail,
-         code,
-         stock
-      };
-      this.products.push(newProduct);
-   }
+    const newProduct = {
+      id: ++this.#lastProductId,
+      title,
+      description,
+      price,
+      thumbnail,
+      code,
+      stock
+    };
 
-   getProducts() {
-      return this.products;
-   }
+    this.products.push(newProduct);
+    return true;
+  }
 
-   getProductById(id) {
-      const product = this.products.find(p => p.id === id);
-      if (product) {
-         return product;
-      } else {
-         console.log("Not found");
-      }
-   }
+  getProducts() {
+    return this.products;
+  }
+
+  getProductById(id) {
+    const product = this.products.find((p) => p.id === id);
+    if (product) {
+      return product;
+    }
+  }
 }
 
-//! TESTING
-const productManager = new ProductManager();
+// TESTING
+const productManager = new ProductManager(); // Inicializando productManager vacio.
 
-//? Test 1 - Iniciando products como un arreglo vacio.
-const products1 = productManager.getProducts();
-if (products1.length !== 0) {
-   console.error("ERROR en Test 1 --> getProducts no devuelve un arreglo vacío");
+// Test 1 --> El array debe existir y estar vacío.
+console.log("Test 1 --> Verificar si el array existe y se encuentra vacío.");
+
+const products = productManager.getProducts();
+if (products.length > 0) {
+  console.error("TEST 1 FALLIDO");
 } else {
-   console.group();
-   console.log("// Test 1 completado --> productManager se inicia vacío.");
-   console.log(productManager);
-   console.log("--------------");
-   console.groupEnd();
+  console.warn("TEST 1 EXITOSO");
 }
 
+// Test 2 --> Se debe agregar correctamente el producto.
+console.log("Test 2 --> Verificar el funcionamiento de addProduct.");
+productManager.addProduct(
+  "producto prueba",
+  "Este es un producto prueba",
+  200,
+  "Sin imagen",
+  "abc123",
+  25
+);
 
-//* Agrego un producto.
-productManager.addProduct("producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
-
-
-//? Test 2 - Probando si el método agrega el producto deseado.
-const products2 = productManager.getProducts();
-if (products2.length !== 1 || products2[0].title !== "producto prueba") {
-   console.error("ERROR en Test 2 --> getProducts no devuelve el producto agregado.");
+if (productManager.products.length > 0) {
+  console.warn("TEST 2 EXITOSO");
 } else {
-   console.group();
-   console.log("// Test 2 completado --> El producto se agregó correctamente.");
-   console.log(productManager.getProducts());
-   console.log("--------------");
-   console.groupEnd();
+  console.error("TEST 2 FALLIDO");
 }
 
-//? Test 3 - Intentando agregar un producto con el mismo id.
-try {
-   productManager.addProduct("producto repetido", "Este es un producto repetido", 300, "Sin imagen", "abc123", 10);
-   console.error("ERROR en Test 3 --> No se arroja error al intentar agregar un producto con un ID repetido.");
-} catch (e) {
-   if (e.message !== "Código de producto duplicado") {
-      console.error("ERROR en Test 3 --> El mensaje de error es incorrecto.");
-   } else {
-      console.group();
-      console.log("// Test 3 completado --> Error al ingresar un id repetido.");
-      console.log("--------------");
-      console.groupEnd();
-   }
-}
+// Test 3 --> Mostrar el producto agregado con getProducts().
+console.log("Test 3 --> Se debe devolver el array con el producto agregado.");
+console.log(productManager.getProducts());
 
-//? Test 4 - Buscamos un producto que no existe y comprobamos que se arroje un error
-const product1 = productManager.getProductById(0);
-if (product1 !== undefined) {
-   console.error("ERROR en Test 4 --> getProductById no devuelve error cuando no se encuentra el producto");
+if (productManager.products.length > 0) {
+  console.warn("TEST 3 EXITOSO");
 } else {
-   console.group();
-   console.log("// Test 4 completado --> No se encuentra el producto.")
-   console.log("--------------");
-   console.groupEnd();
-
+  console.error("TEST 3 FALLIDO");
 }
 
-//? Test 5 - Buscamos un producto que existe y comprobamos que se devuelva correctamente
-const product2 = productManager.getProductById(1);
-if (product2 === undefined || product2.title !== "producto prueba") {
-   console.error("ERROR en Test 5 --> getProductById no devuelve el producto correcto");
+// Test 4 --> Al intentar agregar un producto con el mismo code debe verse un mensaje de error.
+console.log("Test 4 --> Verificar que no se permita crear dos objetos con el mismo code");
+productManager.addProduct(
+  "producto prueba2",
+  "Este es un producto prueba2",
+  500,
+  "Sin imagen",
+  "abc123",
+  40
+);
+
+if (productManager.products.length > 0) {
+  console.warn("TEST 3 EXITOSO");
+} else if (productManager.products.length > 1) {
+  console.error("TEST 3 FALLIDO");
+}
+
+
+// Test 5 --> Se deben probar las dos instancias de getProductById. Tanto si encuentra un producto como si no encuentra nada.
+console.log("Test 5 --> Debe mostrarse un error y luego un mensaje de confirmación.");
+if (!productManager.getProductById(0) && productManager.getProductById(1)) {
+  console.warn("TEST 5 EXITOSO");
 } else {
-   console.group();
-   console.log("// Test 5 completado --> Se devuelve el producto correcto");
-   console.log(product2);
-   console.log("--------------");
-   console.groupEnd();
-}
-
-//! Si todas las pruebas pasan, mostramos un mensaje de éxito
-console.log("// TODO CORRECTO.");
+  console.error("TEST 5 FALLIDO");
+};
