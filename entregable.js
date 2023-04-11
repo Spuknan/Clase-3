@@ -103,10 +103,10 @@ test4 ? console.error("TEST 4 FALLIDO") : console.warn("TEST 4 EXITOSO");
 // Se evaluará que getProductById devuelva error si no encuentra el producto o el producto en caso de encontrarlo
 console.info("TEST 5 --> getProductsById con un ID existente debe devolver el producto.");
 const test5 = pm.getProductById(1);
+console.log(test5);
 
 console.info('TEST 6 --> getProductById con un ID inexistente debe devolver "Not Found".');
 const test6 = pm.getProductById(25);
 
-console.log(test5);
 test5 ? console.warn("TEST 5 EXITOSO") : console.error("TEST 5 FALLIDO");
 test6 ? console.error("TEST 6 FALLIDO") : console.warn("TEST 6 EXITOSO");
